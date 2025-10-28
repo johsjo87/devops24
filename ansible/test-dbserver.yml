@@ -1,0 +1,6 @@
+---
+- name: Test dbserver role
+  hosts: db
+  become: true
+  roles:
+    - dbserver

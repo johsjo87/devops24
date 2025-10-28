@@ -1,0 +1,78 @@
+---
+- name: Security Compliance Checks
+  hosts: all
+
+  tasks:
+    - name: Gather package facts
+      ansible.builtin.package_facts:
+        manager: auto
+
+    - name: Check telnet-server is NOT installed
+      ansible.builtin.assert:
+        that:
+          - "'telnet-server' not in ansible_facts.packages"
+        fail_msg: "telnet-server package is installed"
+        success_msg: "telnet-server package is not installed"
+
+    - name: Check ftp-server is NOT installed
+      ansible.builtin.assert:
+        that:
+          - "'ftp-server' not in ansible_facts.packages"
+        fail_msg: "ftp-server package is installed"
+        success_msg: "ftp-server package is not installed"
+
+    - name: Check xinetd is NOT installed
+      ansible.builtin.assert:
+        that:
+          - "'xinetd' not in ansible_facts.packages"
+        fail_msg: "xinetd package is installed"
+        success_msg: "xinetd package is not installed"
+
+    - name: Check vsftpd is NOT installed
+      ansible.builtin.assert:
+        that:
+          - "'vsftpd' not in ansible_facts.packages"
+        fail_msg: "vsftpd package is installed"
+        success_msg: "vsftpd package is not installed"
+
+    - name: Check telnet is NOT installed
+      ansible.builtin.assert:
+        that:
+          - "'telnet' not in ansible_facts.packages"
+        fail_msg: "telnet package is installed"
+        success_msg: "telnet package is not installed"
+
+    - name: Check rsh-server is NOT installed
+      ansible.builtin.assert:
+        that:
+          - "'rsh-server' not in ansible_facts.packages"
+        fail_msg: "rsh-server package is installed"
+        success_msg: "rsh-server package is not installed"
+
+    - name: Check talk-server is NOT installed
+      ansible.builtin.assert:
+        that:
+          - "'talk-server' not in ansible_facts.packages"
+        fail_msg: "talk-server package is installed"
+        success_msg: "talk-server package is not installed"
+
+    - name: Check ypbind is NOT installed
+      ansible.builtin.assert:
+        that:
+          - "'ypbind' not in ansible_facts.packages"
+        fail_msg: "ypbind package is installed"
+        success_msg: "ypbind package is not installed"
+
+    - name: Check finger is NOT installed
+      ansible.builtin.assert:
+        that:
+          - "'finger' not in ansible_facts.packages"
+        fail_msg: "finger package is installed"
+        success_msg: "finger package is not installed"
+
+    - name: Check talk is NOT installed
+      ansible.builtin.assert:
+        that:
+          - "'talk' not in ansible_facts.packages"
+        fail_msg: "talk package is installed"
+        success_msg: "talk package is not installed"

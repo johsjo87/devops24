@@ -1,0 +1,9 @@
+---
+# vars file for dbserver
+
+db_name: webappdb
+db_user: webappuser
+db_password: "secretpassword"
+deploy_user: deploy
+deploy_group: deploy
+deploy_md_files: "files/*.md"

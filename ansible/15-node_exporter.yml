@@ -1,0 +1,57 @@
+---
+- name: Install and configure Node Exporter
+  hosts: all
+  become: true
+
+  tasks:
+    - name: Ensure node_exporter user exists
+      ansible.builtin.user:
+        name: node_exporter
+        shell: /sbin/nologin
+        system: true
+        create_home: false
+
+    - name: Create textfile collector directory
+      ansible.builtin.file:
+        path: /var/lib/node_exporter/textfile_collector
+        state: directory
+        owner: node_exporter
+        group: node_exporter
+        mode: '0755'
+
+    - name: Copy node_exporter binary
+      ansible.builtin.copy:
+        src: files/node_exporter
+        dest: /usr/sbin/node_exporter
+        owner: node_exporter
+        group: node_exporter
+        mode: '0755'
+
+    - name: Copy systemd service file
+      ansible.builtin.copy:
+        src: files/node_exporter.service
+        dest: /etc/systemd/system/node_exporter.service
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Copy sysconfig file
+      ansible.builtin.copy:
+        src: files/node_exporter.sysconfig
+        dest: /etc/sysconfig/node_exporter
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Enable and start node_exporter
+      ansible.builtin.systemd:
+        name: node_exporter
+        enabled: true
+        state: started
+
+    - name: Allow Node Exporter port in firewalld
+      ansible.posix.firewalld:
+        port: 9100/tcp
+        permanent: true
+        state: enabled
+        immediate: true

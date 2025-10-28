@@ -1,0 +1,99 @@
+---
+# tasks file for webserver
+
+- name: Ensure the /etc/pki/nginx directory exists
+  ansible.builtin.file:
+        path: /etc/pki/nginx
+        state: directory
+        mode: "0755"
+        owner: root
+
+- name: Ensure we have a /etc/pkig/nginx/private directory
+  ansible.builtin.file:
+        path: /etc/pki/nginx/private
+        state: directory
+        mode: "0700"
+        owner: root
+
+- name: Ensure we have necessary software installed
+  ansible.builtin.package:
+        name: python3-cryptography
+        state: present
+
+- name: Ensure we have a private key for our certificate
+  community.crypto.openssl_privatekey:
+        path: /etc/pki/nginx/private/server.key
+
+- name: Create a self-signed certificate
+  community.crypto.x509_certificate:
+        path: /etc/pki/nginx/server.crt
+        privatekey_path: /etc/pki/nginx/private/server.key
+        provider: selfsigned
+
+
+
+- name: Ensure Nginx is installed
+  ansible.builtin.package:
+    name: nginx
+    state: present
+  become: true
+
+- name: Ensure Nginx is running and enabled
+  ansible.builtin.service:
+    name: nginx
+    state: started
+    enabled: true
+  become: true
+
+
+- name: Copy HTTPS configuration to nginx
+  ansible.builtin.copy:
+    src: files/https.conf
+    dest: /etc/nginx/conf.d/https.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart nginx
+  register: result
+  become: true
+
+- name: Configure nginx with template for example.internal
+  ansible.builtin.template:
+    src: templates/example.internal.conf.j2
+    dest: /etc/nginx/conf.d/example.internal.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart nginx
+  become: true
+
+- name: Ensure the web root directory exists
+  ansible.builtin.file:
+    path: /var/www/example.internal/html
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  become: true
+
+
+- name: Upload index.html to example.internal
+  ansible.builtin.copy:
+    src: files/index.html
+    dest: /var/www/example.internal/html/index.html
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+
+- name: Ensure users exist
+  ansible.builtin.user:
+    name: "{{ item.name }}"
+    groups: "{{ item.groups }}"
+    append: yes
+    password: "{{ item.password }}"
+    state: present
+    update_password: on_create
+  loop: "{{ users }}"
+  become: true
+

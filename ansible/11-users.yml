@@ -1,0 +1,19 @@
+---
+- hosts: web
+  become: true
+  vars:
+    users:
+      - { name: 'alovelace', groups: 'wheel,audio,video', password: '$6$rounds=656000$salt1$XxkwPpY2q2iV6QEIZ1Vfc..f6t3Xxt4GyJgr.LfCHkYbHEwL07jTb7hJ7FdaDeDr3NM1QjemsuO3oz94PMHgM0' }
+      - { name: 'aturing',   groups: 'tape', password: '$6$rounds=656000$salt2$nIoP8kemy0vQOvRjqKRmpvQBdroX6wHrhrzlpUGGmM9EfEkLSind4IQvISJ.JlFH.ceXNDyK3EvJ/zFUnFYzW0' }
+      - { name: 'edijkstra', groups: 'tcpdump', password: '$6$rounds=656000$salt3$CDidEVW/IBDIbpjTSaPJtekAknUJAqKpPdSxKsEes/bP6u8jlX4XYV9D2gaFwvhaKn0bAFQpUIm3iEOUECvMu0' }
+      - { name: 'ghopper',  groups: 'wheel,audio', password: '$6$rounds=656000$salt4$dA9okU3W5hYOH.Tq1wXy0CiW7bPfycBNbXDV0cZPrkIopu/.CZZ6ZC5ZHxkz8oyqKJ9hMpuXfJEK2JPOCrd3h/' }
+
+  tasks:
+    - name: Create users with their groups
+      ansible.builtin.user:
+        name: "{{ item.name }}"
+        groups: "{{ item.groups }}"
+        append: yes
+        password: "{{ item.password }}"
+      loop: "{{ users }}"
+

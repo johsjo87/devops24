@@ -1,0 +1,21 @@
+---
+- name: Fix sudo for deploy user
+  hosts: all
+  become: yes
+  vars:
+    deploy_password_hash: '$6$AZwf6LXZ8FuP5.Q8$g2xiUuVBgbz/EgISSXMTHg6VG6tOcIrB0X5JyhHiRKGKXOuYjXfqwAzewtq3oB1akz4q8IZzTexQklf6JbSoU.'
+  tasks:
+
+    - name: Ensure deploy user has a password
+      ansible.builtin.user:
+        name: deploy
+        password: "{{ deploy_password_hash }}"
+
+    - name: Remove passwordless sudo for deploy
+      ansible.builtin.lineinfile:
+        path: /etc/sudoers.d/deploy
+        regexp: 'NOPASSWD:'
+        line: 'deploy ALL=(ALL) ALL'
+        validate: '/usr/sbin/visudo -cf %s'
+
+

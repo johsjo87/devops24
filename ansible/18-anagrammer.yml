@@ -1,0 +1,14 @@
+---
+- name: Test anagrammer module
+  hosts: localhost
+  vars:
+    message: "hello world"
+  tasks:
+    - name: Run the anagrammer module
+      anagrammer:
+        message: "{{ message }}"
+      register: result
+
+    - name: Show output
+      debug:
+        var: result

@@ -1,0 +1,58 @@
+---
+- name: Configure webserver for HTTPS and example.internal
+  hosts: web
+  become: true
+  tasks:
+    - name: Copy HTTPS configuration to nginx
+      ansible.builtin.copy:
+        src: files/https.conf
+        dest: /etc/nginx/conf.d/https.conf
+        owner: root
+        group: root
+        mode: '0644'
+      register: result
+
+    - name: Configure nginx with template for example.internal
+      ansible.builtin.template:
+        src: templates/example.internal.conf.j2
+        dest: /etc/nginx/conf.d/example.internal.conf
+        owner: root
+        group: root
+        mode: '0644'
+
+
+    - name: Ensure the web root directory exists
+      ansible.builtin.file:
+        path: /var/www/example.internal/html
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: Set SELinux context for web root (if SELinux enabled)
+      ansible.builtin.command:
+        cmd: chcon -R -t httpd_sys_content_t /var/www/example.internal/html
+      # Om SELinux inte används på din server kan du kommentera bort denna task
+
+    - name: Upload index.html to example.internal
+      ansible.builtin.copy:
+        src: files/index.html
+        dest: /var/www/example.internal/html/index.html
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Restart nginx to apply new configuration
+      ansible.builtin.service:
+        name: nginx
+        state: restarted
+
+    - name: Debug
+      ansible.builtin.debug:
+         var: result
+
+    - name: When https.conf has changed
+      ansible.builtin.service:
+          name: nginx
+          state: restarted
+      when: result.changed
