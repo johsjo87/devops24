@@ -53,12 +53,24 @@ module.
 
 How can we make the web server start with an addition of just one line to the playbook above?
 
+Svar:
+enabled: true ser till att tjänsten startar vid boot.
+
 # QUESTION B
 
 You make have noted that the `become: true` statement has moved from a specific task to the beginning
 of the playbook, and is on the same indentation level as `tasks:`.
 
 What does this accomplish?
+
+Svar:
+När jag placerar "become: true" på samma indentation level som tasks: istället för inuti varje task betyder det att alla tasks i playbooken automatiskt körs som root, utan att behöva skriva become: true i varje task
+
+- Tidigare behövde vi lägga become: true i varje enskild task som kräver root-rättigheter, t.ex. installation av paket eller start av tjänster.
+
+- Genom att lägga det på playbook-nivå sparar vi tid, minskar risken för fel och gör playbooken mer läsbar.
+
+- Varför det är viktigt: Många Ansible-uppgifter, som att installera program eller starta tjänster, kräver root-rättigheter. Genom att sätta det globalt säkerställer vi att alla tasks som behöver det får rätt behörighet direkt.
 
 # QUESTION C
 
@@ -72,8 +84,20 @@ log in to the machine and make sure that there are no `nginx` processes running.
 
 Why did we change the order of the tasks in the `04-uninstall-webserver.yml` playbook?
 
+Svar:
+Jag ändrade ordningen så att det först stoppar Nginx och stänger av autostart, innan den avinstalleras. 
+Tar man bort Nginx först föröker tjänsten köras ändå vilket kan resultera i fel.
+Ordningen Stoppa -> inaktivera -> avinstallera säkerställer att allt tas bort på ett säkert sätt. 
+
 # BONUS QUESTION
 
 Consider the output from the tasks above, and what we were actually doing on the machine.
 
 What is a good naming convention for tasks? (What SHOULD we write in the `name:` field`?)
+
+Svar:
+Ett bra namn ska vara kort, tydligt och beskriva vad tasken gör.
+om någon utomstående läser det ska dom snabbt förstå vad det handlar om.
+Ska helst börja med ett verb.
+Detta gör playbooken lättare att läsa och underhålla samt underlättar när man felsöker
+

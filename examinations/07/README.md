@@ -28,6 +28,16 @@ is run.
 When you have run the playbook above successfully, how can you verify that the `mariadb`
 service is started and is running?
 
+Svar:
+Jag kontrollerar att tjänsten körs med sudo systemctl status mariadb - och ser active (running)
+sudo mysql -u root gör att jag kan ansluta
+sudo ss -tulpn | grep 3306 - visar att MariaDB lyssnar på port 3306.
+
 # BONUS QUESTION
 
 How many different ways can use come up with to verify that the `mariadb` service is running?
+systemctl is-active mariadb
+sudo systemctl status mariadb
+sudo mysql -u root
+sudo ss -tulpn | grep 3306
+pgrep mariadbd

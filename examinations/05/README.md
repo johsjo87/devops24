@@ -76,6 +76,12 @@ What does the output look like the first time you run this playbook?
 
 What does the output look like the second time you run this playbook?
 
+Svar:
+
+När jag körde playbooken första gången visade outputen att två saker hade ändrats: filen https.conf kopierades till webservern och nginx startades om. Detta syntes i outputen genom att det stod changed på båda dessa tasks, och i sammanfattningen stod det ok=3 changed=2.
+
+När jag körde samma playbook en andra gång såg jag istället att inga ändringar gjordes. Då stod det ok=3 changed=0. Detta beror på att filen redan fanns på plats och nginx inte behövde ändras, vilket visar att playbooken är idempotent (den gör bara ändringar när det faktiskt behövs).
+
 # QUESTION B
 
 Even if we have copied the configuration to the right place, we still do not have a working https service
@@ -114,12 +120,30 @@ Again, these addresses are just examples, make sure you use the IP of the actual
 Note also that `curl` needs the `--insecure` option to establish a connection to a HTTPS server with
 a self signed certificate.
 
+Svar:
+
+När jag först körde playbooken fanns fortfarande inget som svarade på port 443 (HTTPS). Det berodde på att nginx inte hade laddat in den nya konfigurationen ännu.
+
+För att lösa detta lade jag till en extra task i 05-web.yml som startar om nginx med Ansible-modulen ansible.builtin.service. Det gör samma sak som att köra sudo systemctl restart nginx direkt på servern.
+
+Efter att jag körde playbooken igen fungerade både:
+curl -i http://192.168.121.177
+curl -k https://192.168.121.177
+
+Så nu fungerar webserven på både port 80 (http) och 443 (https)
+
 # QUESTION C
 
 What is the disadvantage of having a task that _always_ makes sure a service is restarted, even if there is
 no configuration change?
+Svar:
+Onödigt avbrott - Om tjänsten startas om fast inget har ändrats, det kan göra webbsidan otillgänglig en kort stund.
+Onödig belastning - Serven gör arbete som inte behövs
 
 # BONUS QUESTION
 
 There are at least two _other_ modules, in addition to the `ansible.builtin.service` module that can restart
 a `systemd` service with Ansible. Which modules are they?
+
+ansible.builtin.systemd
+ansible.builtin.command (t.ex. med systemctl restart)

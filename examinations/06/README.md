@@ -166,6 +166,7 @@ See https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_conditional
 There are several ways to accomplish this, and there is no _best_ way to do this with what we've done so far.
 
 Is this a good way to handle these types of conditionals? What do you think?
+ja, med register kan man kontrollera om en uppgift har förändrats. Därefter kan man använda when för att göra det mer effektivt  
 
 # BONUS QUESTION
 
@@ -177,3 +178,6 @@ would you like the flow to work?
 
 Describe in simple terms what your preferred task flow would look like, not necessarily implemented in
 Ansible, but in general terms.
+
+Svar:
+Först kontrollera vilka ändringar som behöver göras, sedan grupperar man liknande uppgifter tillsammans så dom kan utföras i ett svep. Slutligen görs omstarter bara en gång efter alla ändringar för att undvika onödigt driftstop och minska störningar. 
